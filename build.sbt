@@ -28,11 +28,16 @@ lazy val scoverageSettings = Seq(
 lazy val frontend = Project(appName, file("."))
   .enablePlugins(PlayScala)
   .settings(PlayKeys.playDefaultPort := 1024)
+  .configs(IntegrationTest)
+  .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(scoverageSettings:_*)
   .settings(
-    scalaVersion        :=  "2.11.11",
-    resolvers           +=  "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
-    libraryDependencies ++= Seq(
+    scalaVersion                                  :=  "2.11.11",
+    resolvers                                     +=  "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
+    Keys.fork                  in IntegrationTest :=  false,
+    unmanagedSourceDirectories in IntegrationTest :=  (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
+    parallelExecution          in IntegrationTest :=  false,
+    libraryDependencies                           ++= Seq(
       ws,
       "org.jsoup"              %  "jsoup"              % "1.11.2",
       "org.jsoup"              %  "jsoup"              % "1.11.2" % Test,
