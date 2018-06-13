@@ -16,18 +16,17 @@
 
 package services
 
-import javax.inject.Inject
-
 import common.{Logging, RunningResponse}
 import connectors.{HttpConnector, JsonConnector}
+import javax.inject.Inject
 import models.TestRoutesDesc
 import play.api.Configuration
 import play.api.libs.json.{JsObject, JsValue}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Awaitable, Future}
+import scala.concurrent.Future
 import scala.sys.process.Process
+import scala.util.Try
 
 class DefaultSMService @Inject()(val jsonConnector: JsonConnector,
                                  val httpConnector: HttpConnector,
@@ -92,13 +91,22 @@ trait SMService extends Logging {
     jsonConnector.loadServicesJson.fields map { case (service, _) => service}
   }
 
-  def searchForService(query: String): Seq[String]= {
-    if(query.contains("\"")) {
-      exactMatchSearch(jsonConnector.loadServicesJson.fields, query)
-    } else {
-      jsonConnector.loadServicesJson.fields.collect { case (name, _) if name.contains(query) => name}
+  def searchForService(query: String): Seq[String] = {
+    val servicesJson: Seq[(String, JsValue)] = jsonConnector.loadServicesJson.fields
+
+    (isAnInt(query), query.contains("\"")) match {
+      case (true, _) => searchServicesUsingPort(query, servicesJson)
+      case (_, true) => exactMatchSearch(servicesJson, query.toUpperCase)
+      case _ => servicesJson.collect { case (name, _) if name.contains(query.toUpperCase) => name }
     }
   }
+
+  private def isAnInt(query: String): Boolean = Try(query.toInt).isSuccess
+
+  private def searchServicesUsingPort(query: String, servicesJson: => Seq[(String, JsValue)]): Seq[String] =
+    servicesJson
+      .filter { case (_, js) => js.\("defaultPort").asOpt[Int].isDefined }
+      .collect { case (name, js) if js.\("defaultPort").as[Int].toString.contains(query) => name }
 
   private def exactMatchSearch(f: => Seq[(String, JsValue)], quey: String): Seq[String] = {
     val query = quey.trim.replaceAll("\"", "")
