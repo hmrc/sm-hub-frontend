@@ -7,7 +7,7 @@ How to run
 ==========
 
 ```sbtshell
-sbt -DsmPath=/path/ -Dworkspace=/workspace/ -DgithubOrg=your-github-org-name run
+sbt -DsmPath=/Users/foo/bar/config-location -Dworkspace=/Users/foo/bar/location-of-services -DgithubOrg=your-github-org-name run
 ```
 
 This will start the application on port **1024**
@@ -30,7 +30,6 @@ Features
 - Catalogue of test routes for services
 - See currently available versions of assets frontend
 - Generate config
-
 
 License
 =======
