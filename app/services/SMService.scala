@@ -104,9 +104,7 @@ trait SMService extends Logging {
   private def isAnInt(query: String): Boolean = Try(query.toInt).isSuccess
 
   private def searchServicesUsingPort(query: String, servicesJson: => Seq[(String, JsValue)]): Seq[String] =
-    servicesJson
-      .filter { case (_, js) => js.\("defaultPort").asOpt[Int].isDefined }
-      .collect { case (name, js) if js.\("defaultPort").as[Int].toString.contains(query) => name }
+    servicesJson.collect { case (name, js) if js.\("defaultPort").as[Int].toString.contains(query) => name }
 
   private def exactMatchSearch(f: => Seq[(String, JsValue)], quey: String): Seq[String] = {
     val query = quey.trim.replaceAll("\"", "")
