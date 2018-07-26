@@ -9,6 +9,15 @@
     <body>
         @NavBar()
 
+        @if(request.headers.get("update").getOrElse("false").toBoolean) {
+        <div class="alert update-alert alert-dismissible" role="alert" style="margin-top: -20px;">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div class="text-center">
+                <span class="update-tag"><strong>UPDATE</strong></span> An update is available; to update re-run the installation script found in the <a href="https://github.com/hmrc/sm-hub-frontend">Read Me</a>
+            </div>
+        </div>
+        }
+
         <div class="top-block-single">
             <div class="container">
                 <div class="row">

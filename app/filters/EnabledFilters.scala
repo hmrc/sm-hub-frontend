@@ -20,5 +20,5 @@ import javax.inject.Inject
 
 import play.api.http.DefaultHttpFilters
 
-class EnabledFilters @Inject()(requestLoggingFilter: RequestLoggingFilter)
-  extends DefaultHttpFilters(requestLoggingFilter)
+class EnabledFilters @Inject()(requestLoggingFilter: RequestLoggingFilter, updateFilter: UpdateFilter)
+  extends DefaultHttpFilters(requestLoggingFilter, updateFilter)
