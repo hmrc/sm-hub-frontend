@@ -37,10 +37,10 @@ class JsonConnectorSpec extends PlaySpec {
                        |}
                      """.stripMargin
 
-  val testConnector = new JsonConnector {
+  def testConnector(jsonFullOfServices: String = servicesJson):JsonConnector = new JsonConnector {
     override def sourceFileJson(fileName: String): String = {
       fileName match {
-        case "services" => servicesJson
+        case "services" => jsonFullOfServices
         case "profiles" => profilesJson
       }
     }
@@ -48,13 +48,27 @@ class JsonConnectorSpec extends PlaySpec {
 
   "loadServicesJson" should {
     "return a json obj" in {
-      testConnector.loadServicesJson mustBe Json.parse(servicesJson).as[JsObject]
+      val res = testConnector().loadServicesJson
+      res mustBe Json.parse(servicesJson).as[JsObject]
+      res.value.size mustBe 3
+    }
+    "return a json obj with 1000 entries" in {
+      val servicesJson1000 = (2000 to 3000).toList.map(i => Json.obj(s"testService$i" -> Json.obj("defaultPort" -> i))).fold(Json.obj())((a,b) => (a ++ b))
+      val res = testConnector(servicesJson1000.toString()).loadServicesJson
+      res mustBe servicesJson1000
+      res.value.size mustBe 1001
+    }
+    "return a json obj with a random amount of entries" in {
+      val services = (2000 to 2024).toList.map(i => Json.obj(s"testService$i" -> Json.obj("defaultPort" -> i))).fold(Json.obj())((a,b) => (a ++ b))
+      val res = testConnector(services.toString()).loadServicesJson
+      res mustBe services
+      res.value.size mustBe 25
     }
   }
 
   "loadProfilesJson" should {
     "return a json obj" in {
-      testConnector.loadProfilesJson mustBe Json.parse(profilesJson).as[JsObject]
+      testConnector().loadProfilesJson mustBe Json.parse(profilesJson).as[JsObject]
     }
   }
 }

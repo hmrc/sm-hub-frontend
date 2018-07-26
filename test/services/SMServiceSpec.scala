@@ -57,6 +57,8 @@ class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
     "TESTPROFILE2" -> Json.arr("1", "1")
   )
 
+  val servicesJson1000 = (2000 to 3000).toList.filterNot(_ == 2001).map(i => Json.obj(s"testService$i" -> Json.obj("defaultPort" -> i))).fold(Json.obj())((a,b) => (a ++ b))
+
   val servicesJson = Json.obj(
     "testService1" -> Json.obj("defaultPort" -> 1024),
     "testService2" -> Json.obj(
@@ -122,6 +124,20 @@ class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
 
         val result = testService.getValidPortNumbers(Some(1024 -> 1030))
         result mustBe Seq(1027, 1028, 1029, 1030)
+      }
+      "a range has been provided of exactly 1000 difference and no ports exist in that range from loadServicesJson" in {
+        when(mockJsonConnector.loadServicesJson)
+          .thenReturn(servicesJson)
+
+        val result = testService.getValidPortNumbers(Some(8000 -> 9000))
+        result mustBe (8000 to 9000).toList
+        result.size mustBe 1001
+      }
+      "a range has been provided of exactly 1000 difference but 1000 ports exist within that range from loadServicesJson so one remains free" in {
+        when(mockJsonConnector.loadServicesJson)
+          .thenReturn(servicesJson1000)
+        val result = testService.getValidPortNumbers(Some(2000 -> 3000))
+        result.size mustBe 1
       }
     }
   }
