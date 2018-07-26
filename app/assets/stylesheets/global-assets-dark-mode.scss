@@ -222,3 +222,11 @@ table {
   min-width:150px;
 }
 
+.current-textbox{
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  font-size: 16px;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
