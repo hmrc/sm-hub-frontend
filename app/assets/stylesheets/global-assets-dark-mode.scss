@@ -123,6 +123,10 @@ h1, h2, h4 {
   background: #333;
 }
 
+.text-center {
+  color: invert(#333);
+}
+
 .lead {
   color: invert(#333);
 }
@@ -216,5 +220,13 @@ table {
 .input-group-addon-oversized {
   @extend .input-group-addon;
   min-width:150px;
+}
+
+.current-textbox{
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  font-size: 16px;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
 
