@@ -17,9 +17,9 @@
 package controllers
 
 import java.io.File
+import javax.inject.Inject
 
 import forms.{AllProfilesForm, AllServiceForm, AvailablePortsForm, RunningServicesForm, _}
-import javax.inject.Inject
 import models.ConfigSetup
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -161,5 +161,9 @@ trait MainController extends Controller with I18nSupport {
       errors => BadRequest(GenerateConfigView(errors)),
       valid  => Ok(GeneratedConfig(Json.prettyPrint(Json.toJson(valid)(ConfigSetup.writes(githubOrg)))))
     )
+  }
+
+  def viewServiceLogs(service : String) : Action[AnyContent] = Action { implicit request =>
+    Ok(ServiceLogsView(smService.retrieveServiceLogs(service), service))
   }
 }

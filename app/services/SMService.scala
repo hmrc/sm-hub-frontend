@@ -27,6 +27,7 @@ import play.api.libs.json.{JsObject, JsValue}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Awaitable, Future}
+import scala.sys.process.Process
 
 class DefaultSMService @Inject()(val jsonConnector: JsonConnector,
                                  val httpConnector: HttpConnector,
@@ -161,5 +162,9 @@ trait SMService extends Logging {
         case (service, js) if js.\("sources").\("repo").as[String].contains("tools") =>
           service -> js.\("sources").\("repo").as[String]
       }
+  }
+
+  def retrieveServiceLogs(service : String): String = {
+    Process(s"sm -l $service").!!.takeRight(100000).trim
   }
 }

@@ -321,4 +321,15 @@ class MainControllerSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
       status(result) mustBe BAD_REQUEST
     }
   }
+
+  "viewServiceLogs" should {
+    "return an Ok on a valid service" in {
+      when(mockSMService.retrieveServiceLogs("service"))
+        .thenReturn("TEST_LOG")
+
+      val result = testController.viewServiceLogs("service")(request)
+      status(result) mustBe OK
+      contentAsString(result) must include("TEST_LOG")
+    }
+  }
 }
