@@ -29,7 +29,7 @@ Features
 - See conflicting port usages
 - Catalogue of test routes for services
 - See currently available versions of assets frontend
-- Generate config
+- Generate config (For demo purposes at the moment, i.e not complete)
 
 License
 =======
