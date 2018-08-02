@@ -139,6 +139,7 @@ pages.generated-config.heading              = Your new config
 pages.generated-config.info                 = All of this json is completely editable, if anything looks wrong, edit it before copying
 pages.generated-config.copy                 = Copy to clipboard
 
+pages.log.heading                           = Recent logs for {0}
 
 
 

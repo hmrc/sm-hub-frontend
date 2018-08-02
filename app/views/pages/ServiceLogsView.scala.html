@@ -1,0 +1,21 @@
+@import views.html.templates.main_template
+
+@import play.api.libs.json.JsObject
+
+@(log : String, service : String)(implicit request: RequestHeader, messages: Messages)
+
+@main_template(title = messages("app.tab-title")) {
+    <div class="col-md-9">
+        <h2>@messages("pages.log.heading", service)</h2>
+        <hr>
+        <div class="row">
+            <pre id="log" class="log" style="overflow:scroll; height:800px; font-size: 11px;">@log</pre>
+        </div>
+    </div>
+
+    <script>
+            $(document).ready(function () {
+                $('#log').scrollTop($('#log')[0].scrollHeight);
+            });
+    </script>
+}
