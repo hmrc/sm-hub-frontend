@@ -31,7 +31,7 @@
             <a id="@{runningStatus.name}-restart-link" href="@routes.MainController.home(profile, "restart "+runningStatus.name+" -f")">
                 <button title="@messages("pages.running-apps.restart-service")" class="btn btn-primary"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>
             </a>
-            <a id="@{runningStatus.name}-log-link" href="@routes.MainController.viewServiceLogs({runningStatus.name})">
+            <a id="@{runningStatus.name}-log-link" href="@routes.MainController.viewServiceLogs(runningStatus.name)">
                 <button title="@messages("pages.running-apps.logs-service")" class="btn btn-primary"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span></button>
             </a>
         </div>

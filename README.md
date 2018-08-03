@@ -50,13 +50,16 @@ sbt clean coverage test coverageReport
 Features
 ========
 - See currently running services based your teams sm profile
+- Start, stop and restart one service or a profiles worth of services
+- View service logs
 - Search through all available profiles
 - Search through all available services
 - See which ports are available to use
+- Find a set of consecutive ports between a given range
 - See conflicting port usages
 - Catalogue of test routes for services
 - See currently available versions of assets frontend
-- Generate config
+- Generate config (For demo purposes at the moment, i.e not complete)
 
 License
 =======

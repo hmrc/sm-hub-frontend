@@ -10,7 +10,7 @@
         @if(services.nonEmpty) {
             @for(service <- services) {
                 <div class="col-md-6">
-                    <div class="alert alert-info text-center lead">
+                    <div class="alert alert-info text-center lead current-textbox">
                         <a href="@routes.MainController.detailsForService(service)">
                             <strong>@service</strong>
                         </a>

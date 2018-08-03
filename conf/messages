@@ -81,7 +81,8 @@ pages.available-ports.heading               = Available ports
 pages.available-ports.count                 = ports in range
 pages.available-ports.form.start            = Start port
 pages.available-ports.form.end              = End port
-pages.available-ports.no-ports              = Please search for a port range
+pages.available-ports.form.amount           = Amount
+pages.available-ports.no-ports              = Search for ports between one number and another to get all ports in that range. Enter a number into the amount field to get that amount of consecutive ports in that range.
 
 pages.potential-conflicts.heading           = Potential port conflicts
 pages.potential-conflicts.count             = potential conflicts

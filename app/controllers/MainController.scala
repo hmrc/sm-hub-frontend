@@ -68,24 +68,25 @@ trait MainController extends Controller with I18nSupport {
 
   def submitHome(): Action[AnyContent] = Action.async { implicit request =>
     RunningServicesForm.form.bindFromRequest.fold(
-      errors =>
-        smService.getRunningServices().map(services => BadRequest(HomeView(services, errors))),
-      valid =>
-        Future.successful(Redirect(routes.MainController.home(valid)))
+      errors => smService.getRunningServices().map(services => BadRequest(HomeView(services, errors))),
+      valid  => Future.successful(Redirect(routes.MainController.home(valid)))
     )
   }
 
   def availablePorts(): Action[AnyContent] = Action { implicit request =>
-    val ports = smService.getValidPortNumbers(None)
-    Ok(PortsView(ports, AvailablePortsForm.form))
+    Ok(PortsView(Seq.empty, List.empty, AvailablePortsForm.form))
   }
 
   def submitAvailablePorts(): Action[AnyContent] = Action { implicit request =>
     AvailablePortsForm.form.bindFromRequest.fold(
-      errors => BadRequest(PortsView(smService.getValidPortNumbers(None), errors)),
-      valid => {
-        val ports = smService.getValidPortNumbers(Some(valid))
-        Ok(PortsView(ports, AvailablePortsForm.form.fill(valid)))
+      errors => BadRequest(PortsView(Seq.empty, List.empty, errors)),
+      valid  => valid match {
+        case (start, end, Some(amount)) =>
+          val consecutivePorts = smService.getConsecutivePorts((start to end).toList, amount)
+          Ok(PortsView(Seq.empty, consecutivePorts, AvailablePortsForm.form.fill(valid)))
+        case (start, end, _)            =>
+          val ports = smService.getValidPortNumbers(Some((start, end)))
+          Ok(PortsView(ports, List.empty, AvailablePortsForm.form.fill(valid)))
       }
     )
   }
@@ -98,7 +99,7 @@ trait MainController extends Controller with I18nSupport {
   def submitCurrentProfiles(): Action[AnyContent] = Action { implicit request =>
     AllProfilesForm.form.bindFromRequest.fold(
       errors => BadRequest(ProfilesView(smService.getAllProfiles, errors)),
-      valid => Ok(ProfilesView(smService.searchForProfile(valid), AllProfilesForm.form.fill(valid)))
+      valid  => Ok(ProfilesView(smService.searchForProfile(valid), AllProfilesForm.form.fill(valid)))
     )
   }
 
@@ -163,7 +164,7 @@ trait MainController extends Controller with I18nSupport {
     )
   }
 
-  def viewServiceLogs(service : String) : Action[AnyContent] = Action { implicit request =>
+  def viewServiceLogs(service : String): Action[AnyContent] = Action { implicit request =>
     Ok(ServiceLogsView(smService.retrieveServiceLogs(service), service))
   }
 }

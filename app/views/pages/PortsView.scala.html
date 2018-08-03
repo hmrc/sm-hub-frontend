@@ -1,6 +1,6 @@
 @import views.html.templates.{main_template, ErrorPanel}
 
-@(ports: Seq[Int], form: Form[(Int, Int)])(implicit request: RequestHeader, messages: Messages)
+@(ports: Seq[Int], consecutivePorts: List[List[Int]], form: Form[(Int, Int, Option[Int])])(implicit request: RequestHeader, messages: Messages)
 
 @main_template(title = messages("app.tab-title")) {
     <div class="col-md-9">
@@ -20,21 +20,36 @@
                             <input id="endPort" name="endPort" type="text" class="form-control" aria-describedby="sizing-addon1" value="@form("endPort").value">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plane" aria-hidden="true"></span> @messages("app.search")</button>
+
+                    <br>
+                    <br>
+
+                    <div class="form-group">
+                        <div class="input-group @if(form.hasErrors) { has-error }">
+                            <span class="input-group-addon" id="sizing-addon1">@messages("pages.available-ports.form.amount")</span>
+                            <input id="step" name="step" type="text" class="form-control" aria-describedby="sizing-addon1" value="@form("step").value">
+                        </div>
+
+                        <div class="input-group">
+                            <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plane" aria-hidden="true"></span> @messages("app.search")</button>
+                        </div>
+                    </div>
                 </form>
             </div>
 
-            <div id="result-count" class="col-md-3">
-                <strong class="h1">@{ports.size}</strong> @messages("pages.available-ports.count")
-            </div>
+            @if(ports.nonEmpty) {
+                <div id="result-count" class="col-md-3">
+                    <strong class="h1">@{ports.size}</strong> @messages("pages.available-ports.count")
+                </div>
+            }
         </div>
         @if(form.hasErrors) {
             <hr>
             @ErrorPanel(form)
         }
         <hr>
-        <div class="row">
         @if(ports.nonEmpty) {
+        <div class="row">
             @for(port <- ports) {
                 <div class="col-md-2">
                     <div class="alert alert-info text-center lead" role="alert">
@@ -42,9 +57,29 @@
                     </div>
                 </div>
             }
-        } else {
+        </div>
+        }
+
+        @if(consecutivePorts.nonEmpty) {
+            <div class="col-md-12">
+            @for((portList, x) <- consecutivePorts.zipWithIndex) {
+                    <div class="row">
+                        <h4>Option @{x + 1}</h4>
+                        <hr>
+                        @for(port <- portList) {
+                            <div class="col-md-2">
+                                <div class="alert alert-info text-center lead" role="alert">
+                                    <p class="text-center"><strong>@port</strong></p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+            }
+            </div>
+        }
+
+        @if(ports.isEmpty && consecutivePorts.isEmpty) {
             <p class="text-center lead">@messages("pages.available-ports.no-ports")</p>
         }
-        </div>
     </div>
 }

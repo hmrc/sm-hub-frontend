@@ -20,7 +20,6 @@ import common.{Logging, RunningResponse}
 import connectors.{HttpConnector, JsonConnector}
 import javax.inject.Inject
 import models.TestRoutesDesc
-import play.api.Configuration
 import play.api.libs.json.{JsObject, JsValue}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -29,8 +28,7 @@ import scala.sys.process.Process
 import scala.util.Try
 
 class DefaultSMService @Inject()(val jsonConnector: JsonConnector,
-                                 val httpConnector: HttpConnector,
-                                 config: Configuration) extends SMService
+                                 val httpConnector: HttpConnector) extends SMService
 
 trait SMService extends Logging {
   val jsonConnector: JsonConnector
@@ -55,9 +53,7 @@ trait SMService extends Logging {
   }
 
   private def pingMultipleServices(services: Seq[(String, String, Int)]): Future[Seq[RunningResponse]] = {
-    Future.sequence(services map {
-      case (name, url, port) => httpConnector.pingService(name, url, port)
-    })
+    Future.sequence(services.map { case (name, url, port) => httpConnector.pingService(name, url, port) })
   }
 
   def getValidPortNumbers(searchedRange: Option[(Int, Int)]): Seq[Int] = {
@@ -83,7 +79,7 @@ trait SMService extends Logging {
     if(query.contains("\"")) {
       exactMatchSearch(jsonConnector.loadProfilesJson.fields, query)
     } else {
-      jsonConnector.loadProfilesJson.fields.collect { case (name, _) if name.contains(query) => name}
+      jsonConnector.loadProfilesJson.fields.collect { case (name, _) if name.contains(query) => name }
     }
   }
 
@@ -121,18 +117,17 @@ trait SMService extends Logging {
 
   def getDuplicatePorts: Map[Int, Seq[String]] = {
     val validServices = jsonConnector.loadServicesJson.fields
-      .filter{ case (_, js) => js.\("defaultPort").asOpt[Int].isDefined }
+      .filter { case (_, js) => js.\("defaultPort").asOpt[Int].isDefined }
 
-    val allPorts = validServices.map {
-      case(_, js) => js.\("defaultPort").as[Int]
-    }
+    val allPorts = validServices.map { case (_, js) => js.\("defaultPort").as[Int] }
+
     val duplicatePorts = allPorts.diff(allPorts.distinct)
 
     validServices
-      .map{case (service, json) => service -> json.\("defaultPort").as[Int]}
-      .filter{case (_, port) => duplicatePorts.contains(port)}
-      .groupBy{case (_, port) => port}
-      .map{ case (port, services) => port -> services.map { case (name, _) => name } }
+      .map { case (service, json) => service -> json.\("defaultPort").as[Int] }
+      .filter { case (_, port) => duplicatePorts.contains(port) }
+      .groupBy { case (_, port) => port }
+      .map { case (port, services) => port -> services.map { case (name, _) => name } }
   }
 
   def getServicesWithDefinedTestRoutes: Seq[String] = {
@@ -161,7 +156,7 @@ trait SMService extends Logging {
 
   def getAllGHERefs: Seq[(String, String)] = {
     jsonConnector.loadServicesJson.fields
-      .filter{ case(_, js) => js.\("sources").asOpt[JsObject].isDefined }
+      .filter { case (_, js) => js.\("sources").asOpt[JsObject].isDefined }
       .collect {
         case (service, js) if js.\("sources").\("repo").as[String].contains("tools") =>
           service -> js.\("sources").\("repo").as[String]
@@ -170,5 +165,17 @@ trait SMService extends Logging {
 
   def retrieveServiceLogs(service : String): String = {
     Process(s"sm -l $service").!!.takeRight(100000).trim
+  }
+
+  def getConsecutivePorts(searchRange: List[Int], step: Int): List[List[Int]] = {
+    val portsInUse = jsonConnector.loadServicesJson.fields
+      .filter { case (_, js) => js.\("defaultPort").asOpt[Int].isDefined }
+      .map { case (_, js) => js.\("defaultPort").as[Int] }
+
+    searchRange
+      .filterNot(portsInUse.contains)
+      .sliding(step, step)
+      .toList
+      .filter(subList => subList == (subList.head until subList.head + step).toList)
   }
 }
