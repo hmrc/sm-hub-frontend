@@ -25,8 +25,7 @@ import play.api.Configuration
 import play.api.libs.json.{JsObject, JsValue}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Awaitable, Future}
+import scala.concurrent.Future
 import scala.sys.process.Process
 
 class DefaultSMService @Inject()(val jsonConnector: JsonConnector,
@@ -109,6 +108,10 @@ trait SMService extends Logging {
 
   def getServicesInProfile(profile: String): Seq[String] = {
     jsonConnector.loadProfilesJson.\(profile.toUpperCase).as[Seq[String]]
+  }
+
+  def upsertServicesInProfile(profile : String): Boolean = {
+    true
   }
 
   def getDetailsForService(service: String): JsObject = {

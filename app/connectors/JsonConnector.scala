@@ -16,8 +16,9 @@
 
 package connectors
 
-import javax.inject.Inject
+import java.io.PrintWriter
 
+import javax.inject.Inject
 import play.api.Configuration
 import play.api.libs.json.{JsObject, Json}
 
@@ -30,19 +31,45 @@ class DefaultJsonConnector @Inject()(configuration: Configuration) extends JsonC
     if(path.endsWith("/")) path else path.concat("/")
   }
 
-  override def sourceFileJson(fileName: String): String = {
-    Source.fromFile(s"$pathToSM$fileName.json").getLines().mkString
+  override def sourceFile(fileName : String): Iterator[String] = {
+    Source.fromFile(s"$pathToSM$fileName.json").getLines()
+  }
+
+  override def writeToFile(fileName: String, input: String): String = {
+    val writer = new PrintWriter(s"$pathToSM$fileName.json")
+    writer.write(input)
+    writer.close()
+
+    input
   }
 }
 // $COVERAGE-ON$
 
 trait JsonConnector {
-  def sourceFileJson(fileName: String): String
+  def sourceFile(fileName : String) : Iterator[String]
+  def writeToFile(fileName : String, input : String): String
 
   def loadServicesJson: JsObject = loadAndParse("services")
   def loadProfilesJson: JsObject = loadAndParse("profiles")
 
+  def rebuildLine(key : String, profileList: List[String]): String = {
+    val jsonProfileList = Json.arr(profileList).toString.drop(1).dropRight(1)
+    s"""  "$key": $jsonProfileList"""
+  }
+
+  def updateProfilesConfig(profile: String, profileServices: List[String]): String = {
+    val amendedLines = sourceFile("profiles") map {
+      line => if (line.contains(profile)) {
+        rebuildLine(profile, profileServices) + (if (line.last == ',') "," else "")
+      } else {
+        line
+      }
+    }
+
+    writeToFile("profiles", amendedLines.toList.mkString("\n"))
+  }
+
   private def loadAndParse(fileName: String): JsObject = {
-    Json.parse(sourceFileJson(fileName)).as[JsObject]
+    Json.parse(sourceFile(fileName).mkString).as[JsObject]
   }
 }
