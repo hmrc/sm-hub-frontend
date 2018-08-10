@@ -6,7 +6,7 @@ sm-hub-frontend
 How to run: Everyday use
 ========================
 ```bash
-curl --silent https://raw.githubusercontent.com/hmrc/sm-hub-frontend/implicit-startup/sm-hub-install.sh | bash
+curl --silent https://raw.githubusercontent.com/hmrc/sm-hub-frontend/master/sm-hub-install.sh | bash
 ```
 
 This will download the latest version of sm-hub-frontend and place start and stop command in `/usr/local/bin`

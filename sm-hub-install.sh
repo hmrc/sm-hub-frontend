@@ -32,8 +32,8 @@ rm ~/Applications/sm-hub-frontend/sm-hub-frontend-$latest_version.tgz
 echo "Downloaded version $latest_version of sm-hub-frontend to $HOME/Applications/sm-hub-frontend"
 
 echo "Fetching sm-hub start and stop scripts"
-sudo curl --silent -L https://raw.githubusercontent.com/hmrc/sm-hub-frontend/implicit-startup/sm-hub-start.sh --output /usr/local/bin/sm-hub-start
-sudo curl --silent -L https://raw.githubusercontent.com/hmrc/sm-hub-frontend/implicit-startup/sm-hub-stop.sh --output /usr/local/bin/sm-hub-stop
+sudo curl --silent -L https://raw.githubusercontent.com/hmrc/sm-hub-frontend/master/sm-hub-start.sh --output /usr/local/bin/sm-hub-start
+sudo curl --silent -L https://raw.githubusercontent.com/hmrc/sm-hub-frontend/master/sm-hub-stop.sh --output /usr/local/bin/sm-hub-stop
 
 sudo chmod +x /usr/local/bin/sm-hub-*
 
