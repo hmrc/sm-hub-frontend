@@ -425,4 +425,16 @@ class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
       result mustBe List()
     }
   }
+
+  "updateProfilesConfig" should {
+    "update a profile if all the services exist" in {
+      val profile = "PROFILE_IN_QUESTION"
+      val newService = "testService3"
+
+      when(mockJsonConnector.loadServicesJson)
+          .thenReturn(servicesJson)
+
+      testService.updateProfileServices(profile, List(newService)) mustBe true
+    }
+  }
 }

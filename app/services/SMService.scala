@@ -110,10 +110,6 @@ trait SMService extends Logging {
     jsonConnector.loadProfilesJson.\(profile.toUpperCase).as[Seq[String]]
   }
 
-  def upsertServicesInProfile(profile : String): Boolean = {
-    true
-  }
-
   def getDetailsForService(service: String): JsObject = {
     jsonConnector.loadServicesJson.\(service).as[JsObject]
   }
@@ -169,5 +165,19 @@ trait SMService extends Logging {
 
   def retrieveServiceLogs(service : String): String = {
     Process(s"sm -l $service").!!.takeRight(100000).trim
+  }
+
+  def updateProfileServices(profile : String, newServices : List[String]): Boolean = {
+    val allServices = getAllServices
+
+    if (newServices forall {
+      newService => allServices.contains(newService)
+    }) {
+      jsonConnector.updateProfilesConfig(profile, newServices)
+      true
+    } else {
+      logger.warn("Could not update profile, tried to update with non-existent service")
+      false
+    }
   }
 }
