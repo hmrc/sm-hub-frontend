@@ -3,8 +3,35 @@
 sm-hub-frontend
 ================================
 
-How to run
-==========
+How to run: Everyday use
+========================
+```bash
+curl --silent https://raw.githubusercontent.com/hmrc/sm-hub-frontend/implicit-startup/sm-hub-install.sh | bash
+```
+
+This will download the latest version of sm-hub-frontend and place start and stop command in `/usr/local/bin`
+
+Once installed you can use 
+
+```bash
+sm-hub-start
+```
+
+To start sm-hub on port `1024`
+
+and 
+
+```bash
+sm-hub-stop
+```
+
+To kill the current sm-hub process
+
+To update sm-hub simply re run the install command as it will kill the current sm-hub process, purge your current version and download the latest.
+
+
+How to run: Local development
+=============================
 
 ```sbtshell
 sbt -DsmPath=/Users/foo/bar/config-location -Dworkspace=/Users/foo/bar/location-of-services -DgithubOrg=your-github-org-name run

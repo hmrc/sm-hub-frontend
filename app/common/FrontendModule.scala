@@ -17,9 +17,9 @@
 package common
 
 import com.google.inject.AbstractModule
-import connectors.{DefaultHttpConnector, DefaultJsonConnector, HttpConnector, JsonConnector}
+import connectors._
 import controllers.{DefaultMainController, MainController}
-import filters.{DefaultRequestLoggingFilter, RequestLoggingFilter}
+import filters.{DefaultRequestLoggingFilter, DefaultUpdateFilter, RequestLoggingFilter, UpdateFilter}
 import services.{DefaultSMService, SMService}
 
 class FrontendModule extends AbstractModule {
@@ -33,12 +33,14 @@ class FrontendModule extends AbstractModule {
   def bindCommon(): Unit = {
     bind(classOf[Http]).to(classOf[DefaultHttp]).asEagerSingleton()
     bind(classOf[RequestLoggingFilter]).to(classOf[DefaultRequestLoggingFilter]).asEagerSingleton()
+    bind(classOf[UpdateFilter]).to(classOf[DefaultUpdateFilter]).asEagerSingleton()
     bind(classOf[ErrorHandler]).to(classOf[DefaultErrorHandler]).asEagerSingleton()
   }
 
   def bindConnectors(): Unit = {
     bind(classOf[JsonConnector]).to(classOf[DefaultJsonConnector]).asEagerSingleton()
     bind(classOf[HttpConnector]).to(classOf[DefaultHttpConnector]).asEagerSingleton()
+    bind(classOf[UpdateConnector]).to(classOf[DefaultUpdateConnector]).asEagerSingleton()
   }
 
   def bindServices(): Unit = {

@@ -44,3 +44,24 @@
   -webkit-hyphens: auto;
   hyphens: auto;
 }
+
+.update-alert {
+  @extend .alert;
+  background-color: #FFFFFF;
+  font-size: 17px;
+  height: auto;
+  border-bottom: 6px solid #3a7aaa;
+
+  a {
+    text-decoration: underline;
+  }
+
+  .update-tag {
+    border: solid;
+    border-radius: 10px;
+    padding: 5px 10px 5px 10px;
+    color: #ffffff;
+    background-color: #3a7aaa;
+    border: #3a7aaa;
+  }
+}

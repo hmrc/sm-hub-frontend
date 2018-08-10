@@ -55,13 +55,11 @@ trait SMService extends Logging {
     }
   }
 
- private def pingMultipleServices(services:Seq[(String,String,Int)]):Future[Seq[RunningResponse]] = {
-  Future.sequence(services.map{ service => {
-    val (name, url, port) = service
-    httpConnector.pingService(name, url, port)
-    }
-  })
- }
+  private def pingMultipleServices(services: Seq[(String, String, Int)]): Future[Seq[RunningResponse]] = {
+    Future.sequence(services map {
+      case (name, url, port) => httpConnector.pingService(name, url, port)
+    })
+  }
 
   def getValidPortNumbers(searchedRange: Option[(Int, Int)]): Seq[Int] = {
     searchedRange match {
