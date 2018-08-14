@@ -17,6 +17,7 @@
 package services
 
 import java.net.ConnectException
+import java.nio.charset.CodingErrorAction
 
 import common.{AmberResponse, GreenResponse, RedResponse}
 import connectors.{HttpConnector, JsonConnector}
@@ -27,11 +28,12 @@ import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.io.{Codec, Source}
 
 class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
 
@@ -179,21 +181,17 @@ class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
   }
 
   "searchForService" should {
-    val searchJson = Json.obj(
-      "cars"    -> Json.obj(),
-      "bars"    -> Json.obj(),
-      "scars"   -> Json.obj(),
-      "sabars"  -> Json.obj(),
-      "chicken" -> Json.obj(),
-      "burger"  -> Json.obj()
-    )
+    val decoder = Codec.UTF8.decoder.onMalformedInput(CodingErrorAction.IGNORE)
+    val searchJson = Json.parse(
+      Source.fromFile("test/data/services.json")(decoder)
+      .getLines().mkString).as[JsObject]
 
     "return a seq of services (cars)" in {
       when(mockJsonConnector.loadServicesJson)
         .thenReturn(searchJson)
 
       val result = testService.searchForService("cars")
-      result mustBe Seq("cars", "scars")
+      result mustBe Seq("CARS", "SCARS")
     }
 
     "return a seq of services (bars)" in {
@@ -201,7 +199,7 @@ class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
         .thenReturn(searchJson)
 
       val result = testService.searchForService("bars")
-      result mustBe Seq("bars", "sabars")
+      result mustBe Seq("BARS", "SABARS")
     }
 
     "return a seq of services (rs)" in {
@@ -209,7 +207,7 @@ class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
         .thenReturn(searchJson)
 
       val result = testService.searchForService("rs")
-      result mustBe Seq("cars", "bars", "scars", "sabars")
+      result mustBe Seq("CARS", "BARS", "SCARS", "SABARS")
     }
 
     "return a seq of services (urg)" in {
@@ -217,7 +215,7 @@ class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
         .thenReturn(searchJson)
 
       val result = testService.searchForService("urg")
-      result mustBe Seq("burger")
+      result mustBe Seq("BURGER")
     }
 
     "return a seq of services (chi)" in {
@@ -225,10 +223,34 @@ class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
         .thenReturn(searchJson)
 
       val result = testService.searchForService("chi")
-      result mustBe Seq("chicken")
+      result mustBe Seq("CHICKEN")
     }
 
-    "return an empty seq if no services are found" in {
+    "return a seq of services (10)" in {
+      when(mockJsonConnector.loadServicesJson)
+        .thenReturn(searchJson)
+
+      val result = testService.searchForService("10")
+      result mustBe Seq("CARS", "BARS", "SCARS")
+    }
+
+    "return a seq of services (1024)" in {
+      when(mockJsonConnector.loadServicesJson)
+        .thenReturn(searchJson)
+
+      val result = testService.searchForService("1024")
+      result mustBe Seq("CARS")
+    }
+
+    "return an empty seq if no services are found by port" in {
+      when(mockJsonConnector.loadServicesJson)
+        .thenReturn(searchJson)
+
+      val result = testService.searchForService("7777")
+      result mustBe Seq()
+    }
+
+    "return an empty seq if no services are found by name" in {
       when(mockJsonConnector.loadServicesJson)
         .thenReturn(searchJson)
 
@@ -241,7 +263,7 @@ class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
         .thenReturn(searchJson)
 
       val result = testService.searchForService(""" "cars" """)
-      result mustBe Seq("cars")
+      result mustBe Seq("CARS")
     }
   }
 
