@@ -18,7 +18,7 @@
 
     <div class="col-md-4">
         <div id="@{runningStatus.name}-running-response" class="alert @evaluateResponse() text-center" role="alert">
-            <a id="@{runningStatus.name}-details-link" href="@routes.MainController.detailsForService()">
+            <a id="@{runningStatus.name}-details-link" href="@routes.MainController.detailsForService(runningStatus.name)">
                 @{runningStatus.name} <br> @{runningStatus.port}
             </a>
             <br><br>
