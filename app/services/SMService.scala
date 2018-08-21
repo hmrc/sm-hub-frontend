@@ -168,14 +168,18 @@ trait SMService extends Logging {
   }
 
   def getConsecutivePorts(searchRange: List[Int], step: Int): List[List[Int]] = {
+    def filterConsecutives(groupedList: List[List[Int]]): List[List[Int]] = {
+      groupedList.filter(subList => subList == (subList.head until subList.head + step).toList)
+    }
+
     val portsInUse = jsonConnector.loadServicesJson.fields
       .filter { case (_, js) => js.\("defaultPort").asOpt[Int].isDefined }
       .map { case (_, js) => js.\("defaultPort").as[Int] }
 
-    searchRange
-      .filterNot(portsInUse.contains)
-      .sliding(step, step)
-      .toList
-      .filter(subList => subList == (subList.head until subList.head + step).toList)
+    val availablePorts = searchRange.filterNot(portsInUse.contains)
+
+    val firstSearch = filterConsecutives(availablePorts.grouped(step).toList)
+
+    if(firstSearch.nonEmpty) firstSearch else filterConsecutives(availablePorts.sliding(step).toList)
   }
 }
