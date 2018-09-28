@@ -44,8 +44,8 @@ private object TestDependencies extends Versions {
 }
 
 trait Versions {
-  val jsoupVersion      = "1.11.2"
+  val jsoupVersion      = "1.11.3"
   val scalaTestPlusPlay = "2.0.1"
-  val mockitoVersion    = "2.13.0"
+  val mockitoVersion    = "2.22.0"
   val pegdownVersion    = "1.6.0"
 }

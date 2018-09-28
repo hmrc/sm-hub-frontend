@@ -17,6 +17,8 @@
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
+import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
+import uk.gov.hmrc.SbtArtifactory
 
 val appName = "sm-hub-frontend"
 
@@ -28,18 +30,20 @@ lazy val scoverageSettings = Seq(
 )
 
 lazy val frontend = Project(appName, file("."))
-  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
   .settings(PlayKeys.playDefaultPort := 1024)
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
-  .settings(scoverageSettings:_*)
+  .settings(scoverageSettings: _*)
   .settings(scalaSettings: _*)
   .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
   .settings(
-    scalaVersion                                  :=  "2.11.11",
+    scalaVersion                                  :=  "2.11.12",
     resolvers                                     +=  "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
     libraryDependencies                           ++= AppDependencies(),
+    majorVersion                                  :=  0,
+    makePublicallyAvailableOnBintray              := true,
     Keys.fork                  in IntegrationTest :=  false,
     unmanagedSourceDirectories in IntegrationTest :=  (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
     parallelExecution          in IntegrationTest :=  false
