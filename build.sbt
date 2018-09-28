@@ -38,6 +38,7 @@ lazy val frontend = Project(appName, file("."))
   .settings(scalaSettings: _*)
   .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
+  .settings(SbtDistributablesPlugin.publishingSettings: _*)
   .settings(
     scalaVersion                                  :=  "2.11.12",
     resolvers                                     +=  "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
