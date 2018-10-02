@@ -16,17 +16,16 @@
 
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 import uk.gov.hmrc.SbtArtifactory
 
 val appName = "sm-hub-frontend"
 
 lazy val scoverageSettings = Seq(
-  ScoverageKeys.coverageExcludedPackages  := "<empty>;Reverse.*;models/.data/..*;views.*;models.*;filters.*;common.*;.*(AuthService|BuildInfo|Routes).*",
-  ScoverageKeys.coverageMinimum           := 80,
-  ScoverageKeys.coverageFailOnMinimum     := true,
-  ScoverageKeys.coverageHighlighting      := true
+  ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;models/.data/..*;views.*;models.*;filters.*;common.*;.*(AuthService|BuildInfo|Routes).*",
+  ScoverageKeys.coverageMinimum          := 80,
+  ScoverageKeys.coverageFailOnMinimum    := true,
+  ScoverageKeys.coverageHighlighting     := true
 )
 
 lazy val frontend = Project(appName, file("."))
@@ -36,7 +35,6 @@ lazy val frontend = Project(appName, file("."))
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(scoverageSettings: _*)
   .settings(scalaSettings: _*)
-  .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
   .settings(SbtDistributablesPlugin.publishingSettings: _*)
   .settings(
@@ -44,7 +42,7 @@ lazy val frontend = Project(appName, file("."))
     resolvers                                     +=  "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
     libraryDependencies                           ++= AppDependencies(),
     majorVersion                                  :=  0,
-    makePublicallyAvailableOnBintray              := true,
+    makePublicallyAvailableOnBintray              :=  true,
     Keys.fork                  in IntegrationTest :=  false,
     unmanagedSourceDirectories in IntegrationTest :=  (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
     parallelExecution          in IntegrationTest :=  false
