@@ -38,12 +38,12 @@ lazy val frontend = Project(appName, file("."))
   .settings(defaultSettings(): _*)
   .settings(SbtDistributablesPlugin.publishingSettings: _*)
   .settings(
-    scalaVersion                                  :=  "2.11.12",
-    resolvers                                     +=  "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
-    libraryDependencies                           ++= AppDependencies(),
-    majorVersion                                  :=  0,
-    makePublicallyAvailableOnBintray              :=  true,
-    Keys.fork                  in IntegrationTest :=  false,
-    unmanagedSourceDirectories in IntegrationTest :=  (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
-    parallelExecution          in IntegrationTest :=  false
+    scalaVersion                                         :=  "2.11.12",
+    resolvers                                            +=  "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
+    libraryDependencies                                  ++= AppDependencies(),
+    majorVersion                                         :=  0,
+    makePublicallyAvailableOnBintray                     :=  true,
+    Keys.fork                         in IntegrationTest :=  false,
+    unmanagedSourceDirectories        in IntegrationTest :=  (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
+    parallelExecution                 in IntegrationTest :=  false
   )
