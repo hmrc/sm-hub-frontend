@@ -42,7 +42,7 @@ lazy val frontend = Project(appName, file("."))
     resolvers                                            +=  "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
     libraryDependencies                                  ++= AppDependencies(),
     majorVersion                                         :=  0,
-    //makePublicallyAvailableOnBintray                     :=  true,
+    makePublicallyAvailableOnBintray                     :=  true,
     Keys.fork                         in IntegrationTest :=  false,
     unmanagedSourceDirectories        in IntegrationTest :=  (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
     parallelExecution                 in IntegrationTest :=  false
