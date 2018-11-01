@@ -1,0 +1,36 @@
+@import views.html.templates.{main_template, ErrorPanel}
+
+@(form : Form[String], profile : String, servs : Seq[String])(implicit request: RequestHeader, messages: Messages)
+
+@services = @{servs.mkString("\n")}
+
+@main_template(title = messages("app.tab-title")) {
+    <div class="col-md-9">
+        <h2>@messages("pages.profile-services.heading", profile)</h2>
+
+        <hr>
+        <p>@messages("pages.profile-services.hint", profile)</p>
+
+        @if(form.hasErrors) {
+        <hr>
+            @ErrorPanel(form)
+        }
+
+        <form class="form-inline" action="@routes.MainController.submitProfileServices(profile)" method="post">
+            <div class="form-group">
+                <div class="input-group @if(form.hasErrors) { has-error }">
+                    <textarea name="services" cols="60" rows="40" style="font-size:13px">@services</textarea>
+
+                    <br /><br />
+                    <button type="submit" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-plane" aria-hidden="true"></span> @messages("pages.profile-services.edit")
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+        </div>
+
+    </div>
+
+}

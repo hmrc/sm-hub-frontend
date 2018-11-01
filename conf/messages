@@ -40,6 +40,8 @@ validation.required.profiles                = Enter a profile
 validation.required.port                    = Enter a valid port between 1024 and 65535
 validation.required.port-with-key           = Enter a valid {0} port between 1024 and 65535
 validation.required.port.in-use             = Port {0} is already being used by another service
+validation.required.servicesList            = Enter each service separated by a new line, with only letters, numbers and underscores
+validation.required.missingService          = The service {0} can't be added to the profile as it does not exist
 
 validation.required.serviceName             = Enter a service name
 validation.required.template                = Enter a valid template (play, sbt, dropwizard or spring boot)
@@ -94,6 +96,10 @@ pages.profiles.heading                      = Service manager profiles
 pages.profiles.count                        = available profiles
 pages.profiles.form.label                   = Profile
 pages.profiles.no-profiles                  = Currently, there are no Service manager profiles
+
+pages.profile-services.heading              = Edit profile services for {0}
+pages.profile-services.edit                 = Edit services
+pages.profile-services.hint                 = Edit the list of services for this profile. Separate them by lines, and only use letters, numbers and underscores.
 
 pages.service-details.heading               = Service details for {0}
 pages.service-details.table.template        = Service template

@@ -16,6 +16,7 @@
 
 package common
 
+import play.api.Logger
 import play.api.data.Forms.text
 import play.api.data.format.Formatter
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
@@ -31,6 +32,26 @@ object Validation {
         case _  => Valid
     }
     text.verifying(textConstraint)
+  }
+
+  private[common] def servicesConstraint(key : String)(implicit messages: Messages) = {
+    val regex = """^[a-zA-Z0-9_]{1,64}$"""
+
+    val textConstraint: Constraint[String] = Constraint("constraints.text"){ text =>
+      if (text.split("\n").toList forall { line =>
+        line.trim.matches(regex)
+      }) {
+        Valid
+      } else {
+        Invalid(ValidationError(messages(s"validation.required.$key")))
+      }
+    }
+
+    textConstraint
+  }
+
+  def listOfServices(key: String)(implicit messages: Messages): Mapping[String] = {
+    text.verifying(servicesConstraint(key))
   }
 
   private def intFormatter(min: Int, max: Int)(implicit messages: Messages): Formatter[Int] = new Formatter[Int] {

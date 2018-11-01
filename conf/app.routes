@@ -20,6 +20,9 @@ POST    /current-services           controllers.MainController.submitCurrentServ
 GET     /generate-config            controllers.MainController.showGenerateConfig()
 POST    /generate-config            controllers.MainController.submitGenerateConfig()
 
+GET     /profile-services           controllers.MainController.showProfileServices(profile ?= "")
+POST    /profile-services           controllers.MainController.submitProfileServices(profile ?= "")
+
 GET     /services-in-profile        controllers.MainController.servicesInProfile(profile ?= "")
 GET     /service-details            controllers.MainController.detailsForService(service ?= "")
 GET     /potential-conflicts        controllers.MainController.potentialConflicts()

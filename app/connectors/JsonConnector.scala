@@ -52,21 +52,38 @@ trait JsonConnector {
   def loadServicesJson: JsObject = loadAndParse("services")
   def loadProfilesJson: JsObject = loadAndParse("profiles")
 
-  def rebuildLine(key : String, profileList: List[String]): String = {
+  def buildLine(key : String, profileList: List[String]): String = {
     val jsonProfileList = Json.arr(profileList).toString.drop(1).dropRight(1)
     s"""  "$key": $jsonProfileList"""
   }
 
   def updateProfilesConfig(profile: String, profileServices: List[String]): String = {
-    val amendedLines = sourceFile("profiles") map {
-      line => if (line.contains(profile)) {
-        rebuildLine(profile, profileServices) + (if (line.last == ',') "," else "")
+    val amendedLines = sourceFile("profiles") map { line =>
+      if (line.contains(profile)) {
+        buildLine(profile, profileServices) + (if (line.last == ',') "," else "")
       } else {
         line
       }
     }
 
     writeToFile("profiles", amendedLines.toList.mkString("\n"))
+  }
+
+  def insertProfilesIntoConfig(profile : String, profileServices: List[String]): String = {
+    val newProfiles = loadAndParse("profiles") ++ Json.obj(profile -> profileServices)
+
+    val x = sourceFile("profiles") map { line =>
+      if (line.contains("}")) buildLine(profile, profileServices) else line
+    }
+
+
+
+    println((x ++ "}"))
+
+//    val (part1, part2) = sourceFile("profiles") map {}
+//    println((part2 ++ "," ++ buildLine(profile, profileServices) ++ part1).mkString)
+
+    writeToFile("profiles", newProfiles.toString())
   }
 
   private def loadAndParse(fileName: String): JsObject = {

@@ -27,7 +27,7 @@ import org.mockito.Mockito.{reset, when}
 import org.mockito.ArgumentMatchers
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.BeforeAndAfterEach
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
@@ -330,6 +330,74 @@ class MainControllerSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
       val result = testController.viewServiceLogs("service")(request)
       status(result) mustBe OK
       contentAsString(result) must include("TEST_LOG")
+    }
+  }
+
+  "showProfileServices" should {
+    "return the profiles services" in {
+      val services = Seq("lost", "in", "middle", "ages")
+
+      when(mockSMService.getServicesInProfile(ArgumentMatchers.any()))
+        .thenReturn(services)
+
+      val result = testController.showProfileServices("church")(request)
+      status(result) mustBe OK
+
+      services foreach { serviceName =>
+        contentAsString(result) must include(serviceName)
+      }
+    }
+  }
+
+  "submitProfileServices" should {
+    "update a profiles services" when {
+      "the profile exists and the services provided are valid" in {
+        val services = Seq("lost", "in", "middle", "ages")
+
+        when(mockSMService.upsertProfileServices(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(None)
+        when(mockSMService.getServicesInProfile(ArgumentMatchers.any()))
+          .thenReturn(services)
+
+        val result = testController.submitProfileServices("church")(request.withFormUrlEncodedBody("services" -> services.mkString("\n")))
+        status(result) mustBe OK
+
+        services foreach { serviceName =>
+          contentAsString(result) must include(serviceName)
+        }
+      }
+    }
+
+    "fail to update a profile" when {
+      "the service listing that is provided is not valid" in {
+        val services = Seq("lostfdsr3", "in::ASDASd", "FAS:fwefse-dsfmiddle", "age124141SDADs")
+
+        when(mockSMService.getServicesInProfile(ArgumentMatchers.any()))
+          .thenReturn(services)
+
+        val result = testController.submitProfileServices("church")(request.withFormUrlEncodedBody("services" -> services.mkString("\n")))
+        status(result) mustBe BAD_REQUEST
+
+        services foreach { serviceName =>
+          contentAsString(result) must include(serviceName)
+        }
+      }
+
+      "updating failed due to a service not existing" in {
+        val services = Seq("lost", "in", "middle", "ages")
+
+        when(mockSMService.upsertProfileServices(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Some(""))
+        when(mockSMService.getServicesInProfile(ArgumentMatchers.any()))
+          .thenReturn(services)
+
+        val result = testController.submitProfileServices("church")(request.withFormUrlEncodedBody("services" -> services.mkString("\n")))
+        status(result) mustBe BAD_REQUEST
+
+        services foreach { serviceName =>
+          contentAsString(result) must include(serviceName)
+        }
+      }
     }
   }
 }

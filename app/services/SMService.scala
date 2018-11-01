@@ -167,17 +167,28 @@ trait SMService extends Logging {
     Process(s"sm -l $service").!!.takeRight(100000).trim
   }
 
-  def updateProfileServices(profile : String, newServices : List[String]): Boolean = {
-    val allServices = getAllServices
+  def upsertProfileServices(profile : String, newServices : List[String]): Option[String] = {
+    val allProfiles = getAllProfiles
+    val trimmedServices = newServices map { service =>
+      service.trim
+    }
 
-    if (newServices forall {
-      newService => allServices.contains(newService)
-    }) {
-      jsonConnector.updateProfilesConfig(profile, newServices)
-      true
-    } else {
-      logger.warn("Could not update profile, tried to update with non-existent service")
-      false
+    allProfiles.find(pr => pr == profile) match {
+      case Some(foundProfile) =>
+        val allServices = getAllServices
+
+        trimmedServices
+          .find { newService => !allServices.contains(newService)} match {
+            case Some(missingService) =>
+              logger.warn(s"Service: $missingService not found")
+              Some(missingService)
+            case _                    =>
+              jsonConnector.updateProfilesConfig(foundProfile, trimmedServices)
+              None
+          }
+      case _                  =>
+        jsonConnector.insertProfilesIntoConfig(profile, trimmedServices)
+        None
     }
   }
 }

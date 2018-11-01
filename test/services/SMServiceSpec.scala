@@ -27,7 +27,8 @@ import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import play.api.data.validation.ValidationError
+import play.api.libs.json._
 import play.api.test.Helpers._
 
 import scala.concurrent.Future
@@ -427,14 +428,44 @@ class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
   }
 
   "updateProfilesConfig" should {
-    "update a profile if all the services exist" in {
-      val profile = "PROFILE_IN_QUESTION"
-      val newService = "testService3"
+    "update a profile" when {
+      "all the services exist" in {
+        val profile = "TESTPROFILE1"
+        val newService = "testService3"
 
-      when(mockJsonConnector.loadServicesJson)
+        when(mockJsonConnector.loadProfilesJson)
+          .thenReturn(profilesJson)
+        when(mockJsonConnector.loadServicesJson)
           .thenReturn(servicesJson)
 
-      testService.updateProfileServices(profile, List(newService)) mustBe true
+        testService.upsertProfileServices(profile, List(newService)) mustBe None
+      }
+    }
+
+    "create a profile" when {
+      "it does not exist" in {
+        val profile = "PROFILE_IN_QUESTION"
+        val newService = "testService3"
+
+        when(mockJsonConnector.loadProfilesJson)
+          .thenReturn(profilesJson)
+
+        testService.upsertProfileServices(profile, List(newService)) mustBe None
+      }
+    }
+
+    "fail to update a profile" when {
+      "one of the new services does not exist" in {
+        val profile = "TESTPROFILE1"
+        val newService = "testService3thatdoesnotexist"
+
+        when(mockJsonConnector.loadProfilesJson)
+          .thenReturn(profilesJson)
+        when(mockJsonConnector.loadServicesJson)
+          .thenReturn(servicesJson)
+
+        testService.upsertProfileServices(profile, List(newService)) mustBe Some(newService)
+      }
     }
   }
 }

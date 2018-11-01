@@ -17,12 +17,13 @@
 package controllers
 
 import java.io.File
-import javax.inject.Inject
 
-import forms.{AllProfilesForm, AllServiceForm, AvailablePortsForm, RunningServicesForm, _}
+import javax.inject.Inject
+import forms._
 import models.ConfigSetup
 import play.api.Configuration
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.data.FormError
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller}
 import services.SMService
@@ -165,5 +166,27 @@ trait MainController extends Controller with I18nSupport {
 
   def viewServiceLogs(service : String) : Action[AnyContent] = Action { implicit request =>
     Ok(ServiceLogsView(smService.retrieveServiceLogs(service), service))
+  }
+
+  def showProfileServices(profile : String): Action[AnyContent] = Action { implicit request =>
+    Ok(ProfileServicesView(NewServicesForm.form, profile, smService.getServicesInProfile(profile)))
+  }
+
+  def submitProfileServices(profile : String): Action[AnyContent] = Action { implicit request =>
+    val messages = implicitly[Messages]
+
+    NewServicesForm.form.bindFromRequest.fold(
+      errors => {
+        BadRequest(ProfileServicesView(errors, profile, smService.getServicesInProfile(profile)))
+      },
+      success =>
+        smService.upsertProfileServices(profile, success.split("\n").toList) match {
+          case Some(missingService) =>
+            val formWithErrors = NewServicesForm.form.copy(errors = Seq(FormError("services", messages("validation.required.missingService", missingService))))
+            BadRequest(ProfileServicesView(formWithErrors, profile, smService.getServicesInProfile(profile)))
+          case _                    =>
+            Ok(ProfileServicesView(NewServicesForm.form, profile, smService.getServicesInProfile(profile)))
+        }
+    )
   }
 }
