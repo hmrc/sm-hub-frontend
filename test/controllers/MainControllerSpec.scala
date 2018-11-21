@@ -337,7 +337,7 @@ class MainControllerSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
     "return the profiles services" in {
       val services = Seq("lost", "in", "middle", "ages")
 
-      when(mockSMService.getServicesInProfile(ArgumentMatchers.any()))
+      when(mockSMService.getOptionalProfileServices(ArgumentMatchers.any()))
         .thenReturn(services)
 
       val result = testController.showProfileServices("church")(request)
@@ -346,6 +346,16 @@ class MainControllerSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
       services foreach { serviceName =>
         contentAsString(result) must include(serviceName)
       }
+    }
+
+    "return an empty list of profile services if there is no profile" in {
+      val services = Seq()
+
+      when(mockSMService.getOptionalProfileServices(ArgumentMatchers.any()))
+        .thenReturn(services)
+
+      val result = testController.showProfileServices("church")(request)
+      status(result) mustBe OK
     }
   }
 

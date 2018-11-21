@@ -323,6 +323,22 @@ class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
     }
   }
 
+  "getOptionalProfileServices" should {
+    "return all services in a profile in a seq if they exist" in {
+      when(mockJsonConnector.loadProfilesJson)
+        .thenReturn(profilesJson)
+
+      testService.getOptionalProfileServices("testprofile1") mustBe Seq("testService1", "testService2", "testService3")
+    }
+
+    "return an empty list f" in {
+      when(mockJsonConnector.loadProfilesJson)
+        .thenReturn(profilesJson)
+
+      testService.getOptionalProfileServices("unknown_profile") mustBe Seq()
+    }
+  }
+
   "getDetailsForService" should {
     "return the defined details for the service" in {
       when(mockJsonConnector.loadServicesJson)

@@ -169,24 +169,27 @@ trait MainController extends Controller with I18nSupport {
   }
 
   def showProfileServices(profile : String): Action[AnyContent] = Action { implicit request =>
-    Ok(ProfileServicesView(NewServicesForm.form, profile, smService.getServicesInProfile(profile)))
+    Ok(ProfileServicesView(NewServicesForm.form, profile, smService.getOptionalProfileServices(profile)))
   }
 
   def submitProfileServices(profile : String): Action[AnyContent] = Action { implicit request =>
     val messages = implicitly[Messages]
+    val services = smService.getOptionalProfileServices(profile)
 
     NewServicesForm.form.bindFromRequest.fold(
       errors => {
-        BadRequest(ProfileServicesView(errors, profile, smService.getServicesInProfile(profile)))
+        BadRequest(ProfileServicesView(errors, profile, services))
       },
-      success =>
-        smService.upsertProfileServices(profile, success.split("\n").toList) match {
+      success => {
+        val splitServices = success.split("\n").toList
+        smService.upsertProfileServices(profile, splitServices) match {
           case Some(missingService) =>
             val formWithErrors = NewServicesForm.form.copy(errors = Seq(FormError("services", messages("validation.required.missingService", missingService))))
-            BadRequest(ProfileServicesView(formWithErrors, profile, smService.getServicesInProfile(profile)))
-          case _                    =>
-            Ok(ProfileServicesView(NewServicesForm.form, profile, smService.getServicesInProfile(profile)))
+            BadRequest(ProfileServicesView(formWithErrors, profile, services))
+          case _ =>
+            Ok(ProfileServicesView(NewServicesForm.form, profile, splitServices))
         }
+      }
     )
   }
 }

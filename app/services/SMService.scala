@@ -48,7 +48,7 @@ trait SMService extends Logging {
               val port = json.\("defaultPort").as[Int]
               json.\("healthcheck").\("url").asOpt[String]
                 .fold((name, s"http://localhost:$port/ping/ping", port))(url =>
-                (name, url.replace("${port}", port.toString), port))
+                (name, url.replace(s"$port", port.toString), port))
         })
       }
     }
@@ -110,6 +110,13 @@ trait SMService extends Logging {
     jsonConnector.loadProfilesJson.\(profile.toUpperCase).as[Seq[String]]
   }
 
+  def getOptionalProfileServices(profile: String): Seq[String] = {
+    jsonConnector.loadProfilesJson.\(profile.toUpperCase).asOpt[Seq[String]] match {
+      case Some(profiles) => profiles
+      case _              => Nil
+    }
+  }
+
   def getDetailsForService(service: String): JsObject = {
     jsonConnector.loadServicesJson.\(service).as[JsObject]
   }
@@ -167,28 +174,28 @@ trait SMService extends Logging {
     Process(s"sm -l $service").!!.takeRight(100000).trim
   }
 
+  def operateOnProfileConfig(found: String, newServices : List[String]): PartialFunction[Option[String], Option[String]] =
+    PartialFunction {
+      case _                    =>
+        jsonConnector.updateProfilesConfig(found, newServices)
+        None
+      case Some(missingService) =>
+        logger.warn(s"Service: $missingService not found")
+        Some(missingService)
+    }
+
   def upsertProfileServices(profile : String, newServices : List[String]): Option[String] = {
     val allProfiles = getAllProfiles
     val trimmedServices = newServices map { service =>
       service.trim
     }
 
-    allProfiles.find(pr => pr == profile) match {
+    allProfiles find (_ == profile) match {
       case Some(foundProfile) =>
-        val allServices = getAllServices
-
-        trimmedServices
-          .find { newService => !allServices.contains(newService)} match {
-            case Some(missingService) =>
-              logger.warn(s"Service: $missingService not found")
-              Some(missingService)
-            case _                    =>
-              jsonConnector.updateProfilesConfig(foundProfile, trimmedServices)
-              None
-          }
-      case _                  =>
-        jsonConnector.insertProfilesIntoConfig(profile, trimmedServices)
-        None
+        operateOnProfileConfig(foundProfile, trimmedServices)(trimmedServices.find {
+          newService => !getAllServices.contains(newService)
+        })
+      case _                  => None
     }
   }
 }

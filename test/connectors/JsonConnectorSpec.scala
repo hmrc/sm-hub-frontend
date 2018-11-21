@@ -85,18 +85,6 @@ class JsonConnectorSpec extends PlaySpec {
     }
   }
 
-  "insertProfilesIntoConfig" should {
-    "insert a new profile into configuration" when {
-      "provided with a new profile and its services" in {
-        val testProfile = "testProfile1"
-        val newProfileServices = List("test1", "test2")
-        val res = testConnector().insertProfilesIntoConfig(testProfile, newProfileServices)
-
-        (Json.parse(res).as[JsObject] \ testProfile).as[List[String]] mustBe newProfileServices
-      }
-    }
-  }
-
   "loadProfilesJson" should {
     "return a json obj" in {
       testConnector().loadProfilesJson mustBe Json.parse(profilesJson).as[JsObject]

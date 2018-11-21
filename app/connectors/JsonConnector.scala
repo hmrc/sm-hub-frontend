@@ -69,23 +69,6 @@ trait JsonConnector {
     writeToFile("profiles", amendedLines.toList.mkString("\n"))
   }
 
-  def insertProfilesIntoConfig(profile : String, profileServices: List[String]): String = {
-    val newProfiles = loadAndParse("profiles") ++ Json.obj(profile -> profileServices)
-
-    val x = sourceFile("profiles") map { line =>
-      if (line.contains("}")) buildLine(profile, profileServices) else line
-    }
-
-
-
-    println((x ++ "}"))
-
-//    val (part1, part2) = sourceFile("profiles") map {}
-//    println((part2 ++ "," ++ buildLine(profile, profileServices) ++ part1).mkString)
-
-    writeToFile("profiles", newProfiles.toString())
-  }
-
   private def loadAndParse(fileName: String): JsObject = {
     Json.parse(sourceFile(fileName).mkString).as[JsObject]
   }
