@@ -17,8 +17,9 @@ mkdir -p ~/Applications/sm-hub-frontend/
 $latest_version
 
 echo "Getting latest version of sm-hub"
-latest_version="$(curl --silent "https://api.github.com/repos/hmrc/sm-hub-frontend/releases/latest" | grep '"name":' | sed -E 's/.*"([^"]+)".*/\1/')"
-
+#latest_version="$(curl --silent "https://api.github.com/repos/hmrc/sm-hub-frontend/releases/latest" | grep '"name":' | sed -E 's/.*"([^"]+)".*/\1/')"
+#Intermediate fix to get install script working
+latest_version="0.10.0"
 echo "Downloading version $latest_version of sm-hub-frontend to $HOME/Applications/sm-hub-frontend"
 curl -L https://hmrc.bintray.com/releases/uk/gov/hmrc/sm-hub-frontend_2.11/$latest_version/sm-hub-frontend_2.11-$latest_version.tgz --output ~/Applications/sm-hub-frontend/sm-hub-frontend-$latest_version.tgz
 
