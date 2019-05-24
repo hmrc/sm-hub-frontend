@@ -1,0 +1,13 @@
+@import views.html.templates.{RunningServiceDisplay, main_template, ErrorPanel}
+@import common.{RunningResponse, GreenResponse}
+
+@()(implicit request: RequestHeader, messages: Messages)
+
+@main_template(title = messages("app.tab-title")) {
+
+    <div class="col-md-9">
+        <h2>@messages("pages.running-apps.heading")</h2>
+        <hr>
+    </div>
+
+}

@@ -22,10 +22,11 @@ import play.api.data.Forms._
 import play.api.i18n.Messages
 
 object AvailablePortsForm {
-  def form(implicit messages: Messages): Form[(Int, Int)] = Form(
+  def form(implicit messages: Messages): Form[(Int, Int, Option[Int])] = Form(
     tuple(
       "startPort" -> Validation.portMapping,
-      "endPort"   -> Validation.portMapping
+      "endPort"   -> Validation.portMapping,
+      "step"      -> optional(number)
     )
   )
 }

@@ -50,7 +50,7 @@ class MainControllerSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
     override val smService     = mockSMService
   }
 
-  val lang = Lang("en")
+  val lang     = Lang("en")
   val messages = Messages(lang, mockMessagesApi)
 
   val MOCKED_MESSAGE = "mocked message"
@@ -139,6 +139,16 @@ class MainControllerSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
 
         when(mockSMService.getValidPortNumbers(ArgumentMatchers.any()))
           .thenReturn(Seq(1024, 1025, 1026))
+
+        val result = testController.submitAvailablePorts()(request)
+        status(result) mustBe OK
+      }
+
+      "the range and amount have both been provided" in {
+        val request = FakeRequest().withFormUrlEncodedBody("startPort" -> "1024", "endPort" -> "1030", "step" -> "2")
+
+        when(mockSMService.getConsecutivePorts(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(List(List(1024, 1025), List(1026, 1027)))
 
         val result = testController.submitAvailablePorts()(request)
         status(result) mustBe OK

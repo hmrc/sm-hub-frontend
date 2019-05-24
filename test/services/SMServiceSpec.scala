@@ -447,4 +447,99 @@ class SMServiceSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
       result mustBe List()
     }
   }
+
+  "getConsecutivePorts" should {
+
+    "return the same output as getValidPorts" when {
+      "the step is set to 1 and consecutive ports is flattened" in {
+        val testRange = (1024 to 1030).toList
+
+        when(mockJsonConnector.loadServicesJson)
+          .thenReturn(servicesJson)
+
+        val consecutivePorts = testService.getConsecutivePorts(testRange, step = 1).flatten
+        val validPorts       = testService.getValidPortNumbers(Some(1024, 1030))
+
+        consecutivePorts mustBe validPorts
+      }
+    }
+
+    "return an empty list" when {
+      "no sets of consecutive numbers can be found" in {
+        val testSearchRange = List(5,1,8,9,6,5,3,4,6,7,1,8,3)
+
+        when(mockJsonConnector.loadServicesJson)
+          .thenReturn(servicesJson)
+
+        val result = testService.getConsecutivePorts(testSearchRange, step = 3)
+        assert(result.isEmpty)
+      }
+    }
+
+    "return a list with one list" when {
+      "there are two groups of consecutive numbers grouped by 4" in {
+        val testSearchRange = (1024 to 1032).toList
+
+        when(mockJsonConnector.loadServicesJson)
+          .thenReturn(servicesJson)
+
+        val result = testService.getConsecutivePorts(testSearchRange, step = 4)
+        result mustBe List(List(1027, 1028, 1029, 1030))
+      }
+
+      "the input list is jumbled" in {
+        val testSearchRange = List(1,6,8,4,3,78,1,2,3,7,89,3,3,345,567,1)
+
+        when(mockJsonConnector.loadServicesJson)
+          .thenReturn(servicesJson)
+
+        val result = testService.getConsecutivePorts(testSearchRange, step = 3)
+        result mustBe List(List(1,2,3))
+      }
+    }
+
+    "return a list of 2 lists" when {
+      "there are two groups of consecutive numbers grouped by 3" in {
+        val testSearchRange = (1024 to 1032).toList
+
+        when(mockJsonConnector.loadServicesJson)
+          .thenReturn(servicesJson)
+
+        val result = testService.getConsecutivePorts(testSearchRange, step = 3)
+        result mustBe List(List(1027, 1028, 1029), List(1030, 1031, 1032))
+      }
+
+      "the input list is jumbled" in {
+        val testSearchRange = List(5,6,7,4,3,78,1,2,3,7,89,3,3,345,567,1)
+
+        when(mockJsonConnector.loadServicesJson)
+          .thenReturn(servicesJson)
+
+        val result = testService.getConsecutivePorts(testSearchRange, step = 3)
+        result mustBe List(List(5,6,7), List(1,2,3))
+      }
+    }
+
+    "return a list of 3 lists" when {
+      "there are 3 groups of consecutive numbers grouped by 2" in {
+        val testSearchRange = (1024 to 1032).toList
+
+        when(mockJsonConnector.loadServicesJson)
+          .thenReturn(servicesJson)
+
+        val result = testService.getConsecutivePorts(testSearchRange, step = 2)
+        result mustBe List(List(1027, 1028), List(1029, 1030), List(1031, 1032))
+      }
+
+      "the input list is jumbled" in {
+        val testSearchRange = List(5,6,7,4,3,78,1,2,3,7,89,3,344,345,346,1)
+
+        when(mockJsonConnector.loadServicesJson)
+          .thenReturn(servicesJson)
+
+        val result = testService.getConsecutivePorts(testSearchRange, step = 3)
+        result mustBe List(List(5,6,7), List(1,2,3), List(344,345,346))
+      }
+    }
+  }
 }

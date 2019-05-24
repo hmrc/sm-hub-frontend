@@ -30,7 +30,7 @@
         @if(servicesWithTestRoutes.nonEmpty) {
             @for(service <- servicesWithTestRoutes) {
                 <div class="col-md-6">
-                    <div class="alert alert-info text-center lead">
+                    <div class="alert alert-info text-center lead current-textbox">
                         <a href="@routes.MainController.serviceTestRoutesExpanded(service)">
                             <strong>@service</strong>
                         </a>
